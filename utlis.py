@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 def get_session():
     session = requests.Session()
     session.headers.update({
-        "User-Agent": "wesitelink)",
+        "User-Agent": "MyCrawler/1.0 (+https://example.com/bot)",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     })
@@ -33,8 +33,9 @@ def extract_links(html, base_url):
 
     for a_tag in soup.find_all("a", href=True):
         href = a_tag["href"]
+        # Resolve relative → absolute
         absolute = urljoin(base_url, href)
-        # Remove(#section)
+        # Remove fragment (#section)
         absolute, _ = urldefrag(absolute)
         links.add(absolute)
 
@@ -42,6 +43,10 @@ def extract_links(html, base_url):
 
 
 def extract_forms(html, page_url):
+    """
+    Extract forms from the HTML page.
+    Returns list of dictionaries with method, action, and inputs.
+    """
     soup = BeautifulSoup(html, "html.parser")
     forms = []
 
